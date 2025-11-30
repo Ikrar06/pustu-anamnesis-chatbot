@@ -1,0 +1,107 @@
+{
+  "batuk": {
+    "category": "respiratory",
+    "intents": ["ISPA"],
+    "synonyms": ["batuk-batuk", "batuk terus", "batuk berdahak", "batuk kering"]
+  },
+  "pilek": {
+    "category": "respiratory",
+    "intents": ["ISPA"],
+    "synonyms": ["ingusan", "hidung meler", "flu", "bersin"]
+  },
+  "demam": {
+    "category": "fever",
+    "intents": ["ISPA", "demam_typhoid"],
+    "synonyms": ["panas", "meriang", "menggigil", "demam tinggi", "suhu tinggi"]
+  },
+  "sesak napas": {
+    "category": "respiratory",
+    "intents": ["ISPA"],
+    "synonyms": ["sesak", "sesak napas", "napas sesak"]
+  },
+  "sakit tenggorokan": {
+    "category": "respiratory",
+    "intents": ["ISPA"],
+    "synonyms": ["tenggorokan sakit", "sakit tenggorokan", "batuk tenggorokan"]
+  },
+  "pusing": {
+    "category": "neurological",
+    "intents": ["hipertensi"],
+    "synonyms": ["kepala pusing", "pening", "kepala berat", "sakit kepala"]
+  },
+  "tengkuk tegang": {
+    "category": "neurological",
+    "intents": ["hipertensi"],
+    "synonyms": ["tengkuk tegang", "leher kaku"]
+  },
+  "mata berkunang-kunang": {
+    "category": "neurological",
+    "intents": ["hipertensi"],
+    "synonyms": ["mata berkunang-kunang", "melihat kabur"]
+  },
+  "sering haus": {
+    "category": "metabolic",
+    "intents": ["diabetes"],
+    "synonyms": ["haus", "sering haus", "kehausan"]
+  },
+  "sering kencing": {
+    "category": "urinary",
+    "intents": ["diabetes"],
+    "synonyms": ["kencing", "pipis", "buang air kecil", "sering buang air kecil"]
+  },
+  "lemas": {
+    "category": "general",
+    "intents": ["diabetes", "demam_typhoid"],
+    "synonyms": ["lemas", "lemah", "lesu", "kurang tenaga"]
+  },
+  "berat badan turun": {
+    "category": "metabolic",
+    "intents": ["diabetes"],
+    "synonyms": ["berat badan turun", "penurunan berat badan", "turun berat badan"]
+  },
+  "gatal": {
+    "category": "dermatological",
+    "intents": ["dermatitis"],
+    "synonyms": ["gatel", "gatal-gatal", "gatal"]
+  },
+  "ruam": {
+    "category": "dermatological",
+    "intents": ["dermatitis"],
+    "synonyms": ["ruam", "bintik merah", "kemerahan", "ruam merah"]
+  },
+  "bentol": {
+    "category": "dermatological",
+    "intents": ["dermatitis"],
+    "synonyms": ["bentol", "benjolan kecil", "bintil"]
+  },
+  "lidah putih": {
+    "category": "oral",
+    "intents": ["demam_typhoid"],
+    "synonyms": ["lidah putih", "lidah kotor"]
+  },
+  "sakit perut": {
+    "category": "gastrointestinal",
+    "intents": ["demam_typhoid", "dispepsia"],
+    "synonyms": ["sakit perut", "perut sakit", "sakit di perut"]
+  },
+  "mual": {
+    "category": "gastrointestinal",
+    "intents": ["dispepsia"],
+    "synonyms": ["mual", "mau muntah", "mual-mual"]
+  },
+  "muntah": {
+    "category": "gastrointestinal",
+    "intents": ["dispepsia"],
+    "synonyms": ["muntah", "muntah-muntah"]
+  },
+  "kembung": {
+    "category": "gastrointestinal",
+    "intents": ["dispepsia"],
+    "synonyms": ["perut kembung", "kembung", "begah"]
+  },
+  "nyeri ulu hati": {
+    "category": "gastrointestinal",
+    "intents": ["dispepsia"],
+    "synonyms": ["nyeri ulu hati", "ulu hati perih", "perih di ulu hati"]
+  }
+}

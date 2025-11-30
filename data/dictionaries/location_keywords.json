@@ -1,0 +1,9 @@
+{
+  "kepala": ["kepala", "dahi", "pelipis", "tempurung kepala", "kepala bagian atas"],
+  "leher": ["leher", "tengkuk", "tenggorokan", "leher bagian belakang"],
+  "dada": ["dada", "paru", "bagian dada"],
+  "perut": ["perut", "lambung", "ulu hati", "perut bagian atas", "perut bagian bawah", "perut kanan", "perut kiri"],
+  "punggung": ["punggung", "pinggang", "tulang belakang"],
+  "tangan": ["tangan", "lengan", "siku", "pergelangan tangan"],
+  "kaki": ["kaki", "lutut", "betis", "paha"]
+}

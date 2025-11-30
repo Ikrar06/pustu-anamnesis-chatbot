@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs and coverage
+*.log
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Environment files
+.env
+.env.*
+
+# Data & outputs (keep processed data in repo; ignore raw and sensitive outputs)
+data/raw/
+outputs/anamnesis/
+
+# Accept binary model checkpoints if desired; uncomment to ignore
+# outputs/models/
+# *.pkl
+
+# Optional: ignore figure outputs while keeping important ones
+# outputs/figures/
+
+# Sensitive files
+secret.key
+
+# Misc
+*.swp
+
+# Keep README, notebooks, source, and processed data tracked
