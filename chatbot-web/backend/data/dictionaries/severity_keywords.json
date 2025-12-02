@@ -1,0 +1,5 @@
+{
+  "ringan": {"keywords": ["sedikit", "ringan", "agak", "kurang"], "score": 1},
+  "sedang": {"keywords": ["lumayan", "cukup", "sedang", "biasa", "cukup parah"], "score": 2},
+  "berat": {"keywords": ["sangat", "sekali", "parah", "banget", "tidak tahan", "berat", "sangat parah", "parah sekali"], "score": 3}
+}
