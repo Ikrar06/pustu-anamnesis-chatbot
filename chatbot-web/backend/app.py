@@ -249,15 +249,18 @@ class DialogStateManager:
 
         # Replace {nama} placeholder with actual name (prefer nickname if available)
         if '{nama}' in question:
-            if 'nama_panggilan' in self.data:
+            nama_panggilan_text = self.get_text('nama_panggilan')
+            nama_text = self.get_text('nama')
+
+            if nama_panggilan_text:
                 # Use nickname
-                nama = self.data['nama_panggilan']['message'].strip()
+                nama = nama_panggilan_text.strip()
                 nama = re.sub(r'^(panggil\s+)?', '', nama, flags=re.IGNORECASE).strip()
                 if nama:
                     nama = nama.title()
-            elif 'nama' in self.data:
+            elif nama_text:
                 # Use first name only from full name
-                nama = self.data['nama']['message'].strip()
+                nama = nama_text.strip()
                 nama = re.sub(r'^(saya|nama\s+saya|nama)\s+', '', nama, flags=re.IGNORECASE).strip()
                 # Take only first name
                 nama = nama.split()[0] if nama else ''
@@ -285,11 +288,12 @@ class DialogStateManager:
             return True
         return intent in self.expected_intents[self.state]
 
-    def update(self, intent, user_message, entities, is_valid):
+    def update(self, intent, user_message, processed_message, entities, is_valid):
         if is_valid:
             # Store data
             self.data[self.state] = {
                 'message': user_message,
+                'processed': processed_message,  # Store normalized text for summary
                 'intent': intent,
                 'entities': entities
             }
@@ -361,6 +365,12 @@ class DialogStateManager:
             self.state = self.get_next_state()
             skipped += 1
 
+    def get_text(self, state_key):
+        """Get processed text if available, fallback to original message"""
+        if state_key in self.data:
+            return self.data[state_key].get('processed', self.data[state_key]['message'])
+        return None
+
     def get_summary(self):
         summary = []
 
@@ -368,8 +378,9 @@ class DialogStateManager:
         identity_section = []
 
         # Process nama
-        if 'nama' in self.data:
-            nama = self.data['nama']['message'].strip()
+        nama_text = self.get_text('nama')
+        if nama_text:
+            nama = nama_text.strip()
             nama = re.sub(r'^(saya|nama\s+saya|nama)\s+', '', nama, flags=re.IGNORECASE).strip()
             nama = nama.title() if nama else ""
             identity_section.append(f"Nama          : {nama}")
@@ -378,8 +389,9 @@ class DialogStateManager:
             patient_name = ""
 
         # Process umur
-        if 'umur' in self.data:
-            umur = self.data['umur']['message'].strip()
+        umur_text = self.get_text('umur')
+        if umur_text:
+            umur = umur_text.strip()
             umur = re.sub(r'^(saya|aku)\s+', '', umur, flags=re.IGNORECASE)
             # Ensure "tahun" is present
             if not re.search(r'tahun', umur, flags=re.IGNORECASE):
@@ -387,8 +399,9 @@ class DialogStateManager:
             identity_section.append(f"Usia          : {umur}")
 
         # Process jenis_kelamin
-        if 'jenis_kelamin' in self.data:
-            gender = self.data['jenis_kelamin']['message'].strip().lower()
+        gender_text = self.get_text('jenis_kelamin')
+        if gender_text:
+            gender = gender_text.strip().lower()
             # Normalize gender format
             if 'laki' in gender or 'pria' in gender or 'cowok' in gender:
                 gender = 'Laki-laki'
@@ -412,8 +425,9 @@ class DialogStateManager:
         medical_data = []
 
         # Keluhan Utama - remove duration if present
-        if 'keluhan_utama' in self.data:
-            message = self.data['keluhan_utama']['message'].strip()
+        keluhan_text = self.get_text('keluhan_utama')
+        if keluhan_text:
+            message = keluhan_text.strip()
             message = re.sub(r'^(saya|aku)\s+', '', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(dokter|dok|bu|pak|mas|mbak|kak)\s*', ' ', message, flags=re.IGNORECASE)
             # Remove duration patterns - both with and without context words
@@ -426,8 +440,9 @@ class DialogStateManager:
             medical_data.append(f"Keluhan Utama       : {message}")
 
         # Gejala Penyerta - convert to professional terminology
-        if 'gejala' in self.data:
-            message = self.data['gejala']['message'].strip()
+        gejala_text = self.get_text('gejala')
+        if gejala_text:
+            message = gejala_text.strip()
             message = re.sub(r'^(saya|aku)\s+', '', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(saya|aku)\s+', ' ', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(dokter|dok|bu|pak|mas|mbak|kak)\s*', ' ', message, flags=re.IGNORECASE)
@@ -441,14 +456,16 @@ class DialogStateManager:
             medical_data.append(f"Gejala Penyerta     : {message}")
 
         # Durasi
-        if 'durasi' in self.data:
-            message = self.data['durasi']['message'].strip()
+        durasi_text = self.get_text('durasi')
+        if durasi_text:
+            message = durasi_text.strip()
             message = message.capitalize() if message else message
             medical_data.append(f"Durasi              : {message}")
 
         # Lokasi - remove "di" prefix
-        if 'lokasi' in self.data:
-            message = self.data['lokasi']['message'].strip()
+        lokasi_text = self.get_text('lokasi')
+        if lokasi_text:
+            message = lokasi_text.strip()
             message = re.sub(r'^di\s+', '', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(dokter|dok|bu|pak|mas|mbak|kak)\s*', ' ', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+', ' ', message).strip()
@@ -456,7 +473,8 @@ class DialogStateManager:
             medical_data.append(f"Lokasi              : {message}")
 
         # Severity - professional terminology
-        if 'severity' in self.data:
+        severity_text = self.get_text('severity')
+        if severity_text:
             severity_map = {
                 'ringan': 'Ringan',
                 'sedang': 'Sedang',
@@ -464,7 +482,7 @@ class DialogStateManager:
                 'parah': 'Berat',
                 'sangat': 'Berat'
             }
-            message = self.data['severity']['message'].strip().lower()
+            message = severity_text.strip().lower()
             for key, value in severity_map.items():
                 if key in message:
                     message = value
@@ -481,8 +499,9 @@ class DialogStateManager:
         history_data = []
 
         # Riwayat Penyakit
-        if 'riwayat_penyakit' in self.data:
-            message = self.data['riwayat_penyakit']['message'].strip()
+        riwayat_penyakit_text = self.get_text('riwayat_penyakit')
+        if riwayat_penyakit_text:
+            message = riwayat_penyakit_text.strip()
             message = re.sub(r'^(saya|aku)\s+', '', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(dokter|dok|bu|pak|mas|mbak|kak)\s*', ' ', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+', ' ', message).strip()
@@ -494,8 +513,9 @@ class DialogStateManager:
             history_data.append(f"Riwayat Penyakit    : {message}")
 
         # Riwayat Obat
-        if 'riwayat_obat' in self.data:
-            message = self.data['riwayat_obat']['message'].strip()
+        riwayat_obat_text = self.get_text('riwayat_obat')
+        if riwayat_obat_text:
+            message = riwayat_obat_text.strip()
             message = re.sub(r'^(saya|aku)\s+', '', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(dokter|dok|bu|pak|mas|mbak|kak)\s*', ' ', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+', ' ', message).strip()
@@ -507,8 +527,9 @@ class DialogStateManager:
             history_data.append(f"Obat yang Dikonsumsi : {message}")
 
         # Alergi
-        if 'alergi' in self.data:
-            message = self.data['alergi']['message'].strip()
+        alergi_text = self.get_text('alergi')
+        if alergi_text:
+            message = alergi_text.strip()
             message = re.sub(r'^(saya|aku)\s+', '', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(dokter|dok|bu|pak|mas|mbak|kak)\s*', ' ', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+', ' ', message).strip()
@@ -520,8 +541,9 @@ class DialogStateManager:
             history_data.append(f"Riwayat Alergi      : {message}")
 
         # Faktor Risiko
-        if 'faktor_risiko' in self.data:
-            message = self.data['faktor_risiko']['message'].strip()
+        faktor_risiko_text = self.get_text('faktor_risiko')
+        if faktor_risiko_text:
+            message = faktor_risiko_text.strip()
             message = re.sub(r'^(saya|aku)\s+', '', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+(dokter|dok|bu|pak|mas|mbak|kak)\s*', ' ', message, flags=re.IGNORECASE)
             message = re.sub(r'\s+', ' ', message).strip()
@@ -645,7 +667,7 @@ def chat():
     if is_uncertain or predicted_intent == 'tidak_jelas':
         # User doesn't know - accept it and move on
         is_valid = True
-        state_changed = dsm.update(predicted_intent, user_message, result['entities'], is_valid)
+        state_changed = dsm.update(predicted_intent, user_message, result['processed'], result['entities'], is_valid)
     else:
         # Special handling for keluhan_utama (user might mention symptoms + duration/location together)
         if dsm.state == 'keluhan_utama':
@@ -709,7 +731,7 @@ def chat():
             is_valid = dsm.is_intent_valid(predicted_intent)
 
         # Update dialog state
-        state_changed = dsm.update(predicted_intent, user_message, result['entities'], is_valid)
+        state_changed = dsm.update(predicted_intent, user_message, result['processed'], result['entities'], is_valid)
 
         # Smart prefill: auto-fill future states if user already provided info
         if state_changed:
@@ -720,7 +742,7 @@ def chat():
         if not state_changed and dsm.retry_count.get(dsm.state, 0) >= 2:
             # After 2 retries, force accept and move on
             is_valid = True
-            state_changed = dsm.update(predicted_intent, user_message, result['entities'], is_valid)
+            state_changed = dsm.update(predicted_intent, user_message, result['processed'], result['entities'], is_valid)
             if state_changed:
                 dsm.smart_prefill(user_message, result['entities'])
                 dsm.skip_filled_states()
