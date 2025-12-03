@@ -126,11 +126,11 @@ export default function ChatContainer() {
 
         {isLoading && (
           <div className="flex justify-start mb-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-sm">
+            <div className="bg-white dark:bg-[#1f1f1f] rounded-2xl px-4 py-3 shadow-sm border border-gray-200 dark:border-[#2a2a2a]">
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                <div className="w-2 h-2 bg-gray-600 dark:bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-gray-600 dark:bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-gray-600 dark:bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
               </div>
             </div>
           </div>

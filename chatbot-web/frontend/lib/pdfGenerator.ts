@@ -41,7 +41,15 @@ export function generateAnamnesisPDF(data: PDFData) {
   const pageHeight = doc.internal.pageSize.height;
   const marginBottom = 20;
 
-  for (const line of lines) {
+  // Filter out "Berikut ringkasan hasil anamnesis Anda:" and "Terima kasih" lines
+  const filteredLines = lines.filter(line => {
+    const trimmed = line.trim().toLowerCase();
+    return !trimmed.includes('berikut ringkasan') &&
+           !trimmed.includes('terima kasih') &&
+           !trimmed.startsWith('===');
+  });
+
+  for (const line of filteredLines) {
     // Check if we need a new page
     if (currentY > pageHeight - marginBottom) {
       doc.addPage();
@@ -49,22 +57,22 @@ export function generateAnamnesisPDF(data: PDFData) {
     }
 
     // Handle different line types
-    if (line.startsWith('===')) {
-      // Double line separator
-      doc.setLineWidth(0.3);
-      doc.line(15, currentY, 195, currentY);
-      currentY += 4;
-    } else if (line.startsWith('---')) {
-      // Single line separator
-      doc.setLineWidth(0.1);
-      doc.line(15, currentY, 195, currentY);
-      currentY += 4;
+    if (line.startsWith('---')) {
+      // Single line separator - make it subtle
+      doc.setLineWidth(0.2);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(15, currentY - 1, 195, currentY - 1);
+      doc.setDrawColor(0, 0, 0);
+      currentY += 2;
     } else if (line.includes('IDENTITAS PASIEN') || line.includes('ANAMNESIS') || line.includes('RIWAYAT MEDIS')) {
       // Section headers
-      doc.setFontSize(12);
+      if (currentY > 50) {
+        currentY += 3;
+      }
+      doc.setFontSize(13);
       doc.setFont('helvetica', 'bold');
       doc.text(line, 15, currentY);
-      currentY += lineHeight + 2;
+      currentY += lineHeight + 1;
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
     } else if (line.includes(':')) {
@@ -73,17 +81,17 @@ export function generateAnamnesisPDF(data: PDFData) {
       const value = valueParts.join(':').trim();
 
       doc.setFont('helvetica', 'bold');
-      doc.text(field.trim() + ':', 15, currentY);
+      doc.text(field.trim(), 15, currentY);
 
       doc.setFont('helvetica', 'normal');
       // Handle long values with text wrapping
-      const maxWidth = 120;
+      const maxWidth = 125;
       const valueLines = doc.splitTextToSize(value, maxWidth);
-      doc.text(valueLines, 70, currentY);
-      currentY += lineHeight * valueLines.length;
+      doc.text(valueLines, 68, currentY);
+      currentY += lineHeight * Math.max(valueLines.length, 1);
     } else if (line.trim() === '') {
       // Empty line
-      currentY += 3;
+      currentY += 2;
     } else {
       // Regular text with wrapping
       const maxWidth = 180;

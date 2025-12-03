@@ -182,7 +182,7 @@ class DialogStateManager:
             'riwayat_obat': 'Apakah saat ini sedang mengonsumsi obat-obatan?',
             'alergi': 'Apakah {nama} memiliki alergi terhadap makanan atau obat tertentu?',
             'faktor_risiko': 'Apakah ada kebiasaan yang ingin Anda sampaikan? Seperti merokok, kurang olahraga, dll.',
-            'summary': 'Terima kasih {nama} atas informasinya. Berikut ringkasan hasil anamnesis Anda:'
+            'summary': 'Berikut ringkasan hasil anamnesis Anda:'
         }
         self.retry_messages = {
             'nama': ['Boleh tahu nama lengkap Anda?'],
@@ -399,15 +399,14 @@ class DialogStateManager:
             identity_section.append(f"Jenis Kelamin : {gender}")
 
         if identity_section:
-            summary.append("=" * 60)
             summary.append("IDENTITAS PASIEN")
-            summary.append("=" * 60)
+            summary.append("-" * 40)
             summary.extend(identity_section)
             summary.append("")
 
         # Medical History Section
         summary.append("ANAMNESIS")
-        summary.append("-" * 60)
+        summary.append("-" * 40)
 
         # Process each medical field
         medical_data = []
@@ -477,7 +476,7 @@ class DialogStateManager:
 
         # Medical history section
         summary.append("RIWAYAT MEDIS")
-        summary.append("-" * 60)
+        summary.append("-" * 40)
 
         history_data = []
 
@@ -534,7 +533,6 @@ class DialogStateManager:
             history_data.append(f"Faktor Risiko       : {message}")
 
         summary.extend(history_data)
-        summary.append("=" * 60)
 
         return "\n".join(summary)
 
