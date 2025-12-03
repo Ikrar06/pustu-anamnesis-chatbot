@@ -235,11 +235,11 @@ Sistem menggunakan dictionary buatan sendiri di folder `data/dictionaries/`:
 
 | File | Deskripsi | Jumlah Entry |
 |------|-----------|--------------|
-| `symptoms_dict.json` | Daftar gejala medis dengan sinonimnya | 50+ gejala |
-| `location_keywords.json` | Lokasi keluhan di tubuh | 20+ lokasi |
+| `symptoms_dict.json` | Daftar gejala medis dengan sinonimnya | 97 gejala |
+| `location_keywords.json` | Lokasi keluhan di tubuh | 23 lokasi |
 | `severity_keywords.json` | Tingkat keparahan (ringan/sedang/berat) | 3 kategori |
-| `slang_normalization.json` | Normalisasi bahasa gaul ke formal | 100+ kata |
-| `stopwords_id.txt` | Stopwords Bahasa Indonesia | 250+ kata |
+| `slang_normalization.json` | Normalisasi bahasa gaul ke formal | 98 kata |
+| `stopwords_id.txt` | Stopwords Bahasa Indonesia | 93 kata |
 
 **3. Regex-based Entity Extraction**
 
@@ -386,16 +386,7 @@ Untuk berkontribusi:
 - Cek apakah dataset ada di folder `data/`
 - Pastikan virtual environment sudah diaktifkan
 
-## Lisensi
-
-MIT License
-
 ## Kontak
 
 Untuk pertanyaan atau diskusi, silakan buat issue di repository ini.
 
-## Referensi
-
-- Panduan lengkap: `DEPLOYMENT_GUIDE.md`
-- Training notebook: `pustu_chatbot_training.ipynb`
-- Web app README: `chatbot-web/README.md`
