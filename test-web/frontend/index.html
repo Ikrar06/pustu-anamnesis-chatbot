@@ -139,6 +139,29 @@
             color: #888;
         }
 
+        .debug-info {
+            margin-top: 8px;
+            padding: 8px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            font-size: 10px;
+        }
+
+        .debug-item {
+            margin: 4px 0;
+            color: #888;
+            font-family: 'Courier New', monospace;
+        }
+
+        .debug-item:first-child {
+            margin-top: 0;
+        }
+
+        .debug-item:last-child {
+            margin-bottom: 0;
+        }
+
         .input-container {
             padding: 16px 20px;
             background: #1a1a1a;
@@ -262,7 +285,7 @@
             const [sessionId, setSessionId] = useState(null);
             const [isLoading, setIsLoading] = useState(false);
             const chatContainerRef = useRef(null);
-            const API_URL = 'http://localhost:5000';
+            const API_URL = '';
 
             useEffect(() => {
                 // Initial greeting
@@ -385,10 +408,27 @@
                                         <span>{msg.timestamp}</span>
                                         {msg.metadata?.intent && (
                                             <span className="intent-badge">
-                                                {msg.metadata.intent} · {(msg.metadata.confidence * 100).toFixed(0)}%
+                                                Intent: {msg.metadata.intent} · Confidence: {(msg.metadata.confidence * 100).toFixed(1)}%
                                             </span>
                                         )}
                                     </div>
+                                    {msg.metadata && msg.type === 'user' && (
+                                        <div className="debug-info">
+                                            {msg.metadata.state && (
+                                                <div className="debug-item">State: {msg.metadata.state}</div>
+                                            )}
+                                            {msg.metadata.entities && Object.keys(msg.metadata.entities).length > 0 && (
+                                                <div className="debug-item">
+                                                    Entities: {JSON.stringify(msg.metadata.entities)}
+                                                </div>
+                                            )}
+                                            {msg.metadata.processed && (
+                                                <div className="debug-item">
+                                                    Processed: "{msg.metadata.processed}"
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

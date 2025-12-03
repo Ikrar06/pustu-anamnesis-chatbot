@@ -1,13 +1,12 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle
 import re
 import json
 import uuid
 from datetime import datetime
-import os
 
-app = Flask(__name__, static_folder='../frontend', static_url_path='')
+app = Flask(__name__)
 
 # Configure CORS - allow all origins
 CORS(app)
@@ -760,19 +759,5 @@ def reset():
 def health():
     return jsonify({'status': 'ok', 'model': 'loaded'})
 
-# Serve frontend
-@app.route('/')
-def index():
-    return send_from_directory('../frontend', 'index.html')
-
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('../frontend', path)
-
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("Server berjalan di http://localhost:8000")
-    print("Buka browser dan akses: http://localhost:8000")
-    print("Tekan CTRL+C untuk stop server")
-    print("="*60 + "\n")
-    app.run(debug=False, port=8000, host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0')
