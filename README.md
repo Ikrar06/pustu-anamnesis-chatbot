@@ -66,7 +66,7 @@ NLP_CHATBOT/
 ### 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Ikrar06/pustu-anamnesis-chatbot.git
 cd NLP_CHATBOT
 ```
 
