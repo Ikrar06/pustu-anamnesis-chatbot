@@ -1,38 +1,60 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from dotenv import load_dotenv
 import pickle
 import re
 import json
 import uuid
+import os
 from datetime import datetime
 
-app = Flask(__name__)
+load_dotenv()
 
-# Configure CORS - allow all origins for development
-CORS(app, resources={r"/*": {"origins": "*"}})
+app = FastAPI()
 
-# Load models
+# Configure CORS - restrict to Vercel frontend in production
+cors_origins = os.environ.get("CORS_ORIGINS", "https://pustu-anamnesis-chatbot.vercel.app")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins.split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Pydantic request models
+class ChatRequest(BaseModel):
+    message: str = ""
+    session_id: str | None = None
+
+class ResetRequest(BaseModel):
+    session_id: str
+
+# Load models using path relative to this file (works regardless of CWD)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 print("Loading models...")
-with open('outputs/models/tfidf_vectorizer.pkl', 'rb') as f:
+with open(os.path.join(BASE_DIR, 'outputs/models/tfidf_vectorizer.pkl'), 'rb') as f:
     vectorizer = pickle.load(f)
 
-with open('outputs/models/naive_bayes_model.pkl', 'rb') as f:
+with open(os.path.join(BASE_DIR, 'outputs/models/naive_bayes_model.pkl'), 'rb') as f:
     model = pickle.load(f)
 
-with open('outputs/models/slang_dict.pkl', 'rb') as f:
+with open(os.path.join(BASE_DIR, 'outputs/models/slang_dict.pkl'), 'rb') as f:
     slang_dict = pickle.load(f)
 
-with open('outputs/models/stopwords.pkl', 'rb') as f:
+with open(os.path.join(BASE_DIR, 'outputs/models/stopwords.pkl'), 'rb') as f:
     stopwords = pickle.load(f)
 
 # Load dictionaries
-with open('data/dictionaries/symptoms_dict.json', 'r', encoding='utf-8') as f:
+with open(os.path.join(BASE_DIR, 'data/dictionaries/symptoms_dict.json'), 'r', encoding='utf-8') as f:
     symptoms_dict = json.load(f)
 
-with open('data/dictionaries/severity_keywords.json', 'r', encoding='utf-8') as f:
+with open(os.path.join(BASE_DIR, 'data/dictionaries/severity_keywords.json'), 'r', encoding='utf-8') as f:
     severity_dict = json.load(f)
 
-with open('data/dictionaries/location_keywords.json', 'r', encoding='utf-8') as f:
+with open(os.path.join(BASE_DIR, 'data/dictionaries/location_keywords.json'), 'r', encoding='utf-8') as f:
     location_dict = json.load(f)
 
 print("Models loaded successfully!")
@@ -604,15 +626,10 @@ def predict_intent(text):
         'processed': processed
     }
 
-@app.route('/chat', methods=['POST', 'OPTIONS'])
-def chat():
-    if request.method == 'OPTIONS':
-        # Handle preflight request
-        return '', 204
-
-    data = request.json
-    user_message = data.get('message', '')
-    session_id = data.get('session_id')
+@app.post('/chat')
+async def chat(request: ChatRequest):
+    user_message = request.message
+    session_id = request.session_id
 
     # Create or get session
     if not session_id or session_id not in sessions:
@@ -629,7 +646,7 @@ def chat():
             'state': dsm.state
         }
         dsm.state = 'nama'  # Move to nama collection, not keluhan_utama
-        return jsonify(response)
+        return response
 
     # Predict intent
     result = predict_intent(user_message)
@@ -649,7 +666,7 @@ def chat():
         else:
             bot_message = 'Sama-sama! Mari kita lanjutkan. ' + dsm.get_current_question()
 
-        response = {
+        return {
             'session_id': session_id,
             'intent': predicted_intent,
             'confidence': result['confidence'],
@@ -658,7 +675,6 @@ def chat():
             'bot_message': bot_message,
             'state': dsm.state
         }
-        return jsonify(response)
 
     # Handle "tidak tahu" / "tidak jelas" responses - accept and move on
     uncertainty_keywords = ['tidak tahu', 'tidak tau', 'kurang tahu', 'tidak jelas', 'tidak yakin', 'kurang jelas']
@@ -756,7 +772,7 @@ def chat():
     else:
         bot_message = dsm.get_current_question()
 
-    response = {
+    return {
         'session_id': session_id,
         'intent': predicted_intent,
         'confidence': result['confidence'],
@@ -767,36 +783,17 @@ def chat():
         'is_valid': is_valid
     }
 
-    return jsonify(response)
 
-@app.route('/reset', methods=['POST', 'OPTIONS'])
-def reset():
-    if request.method == 'OPTIONS':
-        # Handle preflight request
-        return '', 204
-
-    data = request.json
-    session_id = data.get('session_id')
+@app.post('/reset')
+async def reset(request: ResetRequest):
+    session_id = request.session_id
 
     if session_id and session_id in sessions:
         del sessions[session_id]
 
-    return jsonify({'message': 'Session reset successful'})
+    return {'message': 'Session reset successful'}
 
-@app.route('/health', methods=['GET', 'OPTIONS'])
-def health():
-    if request.method == 'OPTIONS':
-        # Handle preflight request
-        return '', 204
-    return jsonify({'status': 'ok', 'model': 'loaded'})
 
-# Handle CORS preflight requests
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
+@app.get('/health')
+async def health():
+    return {'status': 'ok', 'model': 'loaded'}
